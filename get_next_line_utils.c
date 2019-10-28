@@ -6,7 +6,7 @@
 /*   By: saich <saich@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 19:19:46 by saich             #+#    #+#             */
-/*   Updated: 2019/10/24 19:41:49 by saich            ###   ########.fr       */
+/*   Updated: 2019/10/28 18:06:50 by saich            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,13 +45,13 @@ char	*ft_substr(char const *s, unsigned int start, ssize_t len)
 	return (ret);
 }
 
-char	*ft_strjoin(char *s1, char *s2)
+char	*ft_strjoin(char *s1, char *s2, ssize_t read_size)
 {
 	int		len;
 	char	*res;
 	ssize_t	i;
 
-	len = ft_strlen(s1) + ft_strlen(s2);
+	len = ft_strlen(s1) + read_size;
 	if (!(res = (char*)malloc(sizeof(char) * (len + 1))))
 		return (0);
 	i = 0;
@@ -60,10 +60,9 @@ char	*ft_strjoin(char *s1, char *s2)
 		res[i] = s1[i];
 		i++;
 	}
-	if (s1)
-		free(s1);
 	while (s2 && *s2 != '\0')
 		res[i++] = *s2++;
 	res[i] = '\0';
 	return (res);
 }
+
