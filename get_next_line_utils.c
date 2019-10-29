@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: saich <saich@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/24 19:19:46 by saich             #+#    #+#             */
-/*   Updated: 2019/10/28 18:06:50 by saich            ###   ########.fr       */
+/*   Created: 2019/10/29 17:34:24 by saich             #+#    #+#             */
+/*   Updated: 2019/10/29 17:34:26 by saich            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,13 @@ ssize_t	ft_strlen(const char *s)
 	return (len);
 }
 
-char	*ft_substr(char const *s, unsigned int start, ssize_t len)
+char	*ft_substr(const char *s, unsigned int start, ssize_t len)
 {
 	char	*ptr;
 	char	*ret;
 	char	*cpy_ret;
 
-	if (!s || !(ret = (char*)malloc(sizeof(char) * (len))))
+	if (!s || !(ret = (char*)malloc(sizeof(char) * (len + 1))))
 		return (0);
 	if (start >= ft_strlen(s))
 		ret[0] = '\0';
@@ -65,4 +65,3 @@ char	*ft_strjoin(char *s1, char *s2, ssize_t read_size)
 	res[i] = '\0';
 	return (res);
 }
-

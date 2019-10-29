@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: saich <saich@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/28 17:43:09 by saich             #+#    #+#             */
-/*   Updated: 2019/10/28 18:07:14 by saich            ###   ########.fr       */
+/*   Created: 2019/10/29 17:34:12 by saich             #+#    #+#             */
+/*   Updated: 2019/10/29 17:34:59 by saich            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static char		*ft_strnew(void)
 {
 	char *ret;
 
-	if (!(ret = malloc(sizeof(char))))
+	if (!(ret = (char *)malloc(sizeof(char))))
 		return (0);
 	ret[0] = '\0';
 	return (ret);
@@ -24,7 +24,7 @@ static char		*ft_strnew(void)
 
 static ssize_t	pos_nextline(char *s)
 {
-	ssize_t i;
+	ssize_t	i;
 
 	i = 0;
 	while (s[i] != '\0')
@@ -45,7 +45,8 @@ static int		free_cache(char **cache, int ret)
 	}
 	return (ret);
 }
-static int		extract(char **line, char *cache, int index)
+
+static int		extract(char **line, char **cache, int index)
 {
 	char	*tmp;
 	int		ret;
@@ -54,7 +55,8 @@ static int		extract(char **line, char *cache, int index)
 	{
 		if (!(*line = ft_substr(*cache, 0, index)))
 			return (free_cache(cache, -1));
-		if (!(tmp = ft_substr(*cache, index + 1, ft_strlen(*cache) - index - 1)))
+		if (!(tmp = ft_substr(*cache, index + 1,
+			ft_strlen(*cache) - index - 1)))
 			return (free_cache(cache, -1));
 		ret = 1;
 	}
@@ -69,6 +71,7 @@ static int		extract(char **line, char *cache, int index)
 	*cache = tmp;
 	return (ret);
 }
+
 int				get_next_line(int fd, char **line)
 {
 	ssize_t		read_size;
@@ -77,8 +80,8 @@ int				get_next_line(int fd, char **line)
 	char		*tmp;
 
 	if (fd < 0 || !line)
-		return (-1);
-	while ((read_size = read(fd, buff, BUFFER_SIZE) > 0))
+		return (free_cache(&cache, -1));
+	while ((read_size = read(fd, buff, BUFFER_SIZE)) > 0)
 	{
 		buff[read_size] = '\0';
 		if (!(tmp = ft_strjoin(cache, buff, read_size)))
@@ -90,7 +93,8 @@ int				get_next_line(int fd, char **line)
 	}
 	if (read_size < 0)
 		return (free_cache(&cache, -1));
-	if (read_size == 0 && (!cache || *cache == '\0') && (*line = ft_strnew()))
+	if (read_size == 0 && (!cache || *cache == '\0')
+		&& (*line = ft_strnew()))
 		return (free_cache(&cache, 0));
 	return (extract(line, &cache, pos_nextline(cache)));
 }
