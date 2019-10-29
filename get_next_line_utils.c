@@ -6,7 +6,7 @@
 /*   By: saich <saich@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/29 17:34:24 by saich             #+#    #+#             */
-/*   Updated: 2019/10/29 17:34:26 by saich            ###   ########.fr       */
+/*   Updated: 2019/10/29 17:55:41 by saich            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ ssize_t	ft_strlen(const char *s)
 
 char	*ft_substr(const char *s, unsigned int start, ssize_t len)
 {
-	char	*ptr;
+	char	*str;
 	char	*ret;
 	char	*cpy_ret;
 
@@ -36,10 +36,10 @@ char	*ft_substr(const char *s, unsigned int start, ssize_t len)
 		ret[0] = '\0';
 	else
 	{
-		ptr = (char*)s + start;
+		str = (char*)s + start;
 		cpy_ret = ret;
-		while (*ptr != '\0' && len-- > 0)
-			*cpy_ret++ = *ptr++;
+		while (*str != '\0' && len-- > 0)
+			*cpy_ret++ = *str++;
 		*cpy_ret = '\0';
 	}
 	return (ret);
