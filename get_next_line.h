@@ -1,24 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.h                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: saich <saich@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/29 17:34:34 by saich             #+#    #+#             */
-/*   Updated: 2019/10/29 17:34:37 by saich            ###   ########.fr       */
+/*   Created: 2019/11/07 15:12:10 by saich             #+#    #+#             */
+/*   Updated: 2019/11/07 18:07:40 by saich            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#ifndef GET_NEXT_LINE_BONUS_H
+# define GET_NEXT_LINE_BONUS_H
 
 # include <unistd.h>
 # include <stdlib.h>
 
-int				get_next_line(int fd, char **line);
-ssize_t			ft_strlen(const char *s);
-char			*ft_strjoin(char *s1, char *s2, ssize_t read_size);
-char			*ft_substr(char const *s, unsigned int start, ssize_t len);
+typedef struct		s_cache
+{
+	int				fd;
+	char			*content;
+	struct s_cache	*next;
+}					t_cache;
+
+ssize_t				pos_nextline(char *str);
+int					extract(char **line, t_cache **begin, int index, int fd);
+ssize_t				ft_strlen(const char *str);
+char				*ft_substr(char const *str, unsigned int start,
+					ssize_t len);
+char				*ft_strjoin(char *s1, char *s2);
+int					del_cache(t_cache **begin, int fd);
+char				*ft_strnew(void);
+t_cache				*find_cache_by_fd(t_cache **begin, int fd);
+int					get_next_line(int fd, char **line);
 
 #endif

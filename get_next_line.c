@@ -1,100 +1,111 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: saich <saich@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/29 17:34:12 by saich             #+#    #+#             */
-/*   Updated: 2019/10/29 17:57:28 by saich            ###   ########.fr       */
+/*   Created: 2019/11/07 15:00:33 by saich             #+#    #+#             */
+/*   Updated: 2019/11/07 18:06:40 by saich            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
-static char		*ft_strnew(void)
+char			*ft_strnew(void)
 {
 	char *ret;
 
-	if (!(ret = (char *)malloc(sizeof(char))))
+	if (!(ret = (char *)malloc(sizeof(char) * 1)))
 		return (0);
 	ret[0] = '\0';
 	return (ret);
 }
 
-static ssize_t	pos_nextline(char *s)
+int				del_cache(t_cache **begin, int fd)
 {
-	ssize_t	i;
+	t_cache	*tmp;
+	t_cache	*now;
+	t_cache	*next;
 
-	i = 0;
-	while (s[i] != '\0')
+	tmp = *begin;
+	now = tmp;
+	while (now)
 	{
-		if (s[i] == '\n')
-			return (i);
-		i++;
+		next = now->next;
+		if (now->fd == fd)
+		{
+			if (now->content)
+				free(now->content);
+			if (tmp != now)
+				tmp->next = next;
+			else if (tmp == now)
+				*begin = next;
+			free(now);
+			break ;
+		}
+		tmp = now;
+		now = now->next;
 	}
-	return (-1);
+	return (1);
 }
 
-static int		free_cache(char **cache, int ret)
+static t_cache	*new_cache(int fd)
 {
-	if (*cache)
-	{
-		free(*cache);
-		*cache = 0;
-	}
-	return (ret);
+	t_cache	*cur;
+
+	if (!(cur = (t_cache*)malloc(sizeof(t_cache))))
+		return (0);
+	cur->fd = fd;
+	cur->content = 0;
+	cur->next = 0;
+	return (cur);
 }
 
-static int		extract(char **line, char **cache, int index)
+t_cache			*find_cache_by_fd(t_cache **begin, int fd)
 {
-	char	*tmp;
-	int		ret;
+	t_cache	*cur;
+	t_cache *tmp;
 
-	if (index >= 0)
+	if (*begin == 0)
 	{
-		if (!(*line = ft_substr(*cache, 0, index)))
-			return (free_cache(cache, -1));
-		if (!(tmp = ft_substr(*cache, index + 1,
-			ft_strlen(*cache) - index - 1)))
-			return (free_cache(cache, -1));
-		ret = 1;
+		*begin = new_cache(fd);
+		return (*begin);
 	}
-	else
+	cur = *begin;
+	tmp = 0;
+	while (cur)
 	{
-		if (!(*line = ft_substr(*cache, 0, ft_strlen(*cache))))
-			return (free_cache(cache, -1));
-		tmp = 0;
-		ret = 0;
+		if (cur->fd == fd)
+			return (cur);
+		tmp = cur;
+		cur = cur->next;
 	}
-	free_cache(cache, 0);
-	*cache = tmp;
-	return (ret);
+	tmp->next = new_cache(fd);
+	return (tmp->next);
 }
 
 int				get_next_line(int fd, char **line)
 {
-	ssize_t		read_size;
-	char		buff[BUFFER_SIZE + 1];
-	static char	*cache;
-	char		*tmp;
+	ssize_t			r_size;
+	char			buff[BUFFER_SIZE + 1];
+	static t_cache	*begin;
+	t_cache			*cur;
 
 	if (fd < 0 || !line)
-		return (free_cache(&cache, -1));
-	while ((read_size = read(fd, buff, BUFFER_SIZE)) > 0)
+		return (-1);
+	cur = find_cache_by_fd(&begin, fd);
+	while ((r_size = read(fd, buff, BUFFER_SIZE)) > 0)
 	{
-		buff[read_size] = '\0';
-		if (!(tmp = ft_strjoin(cache, buff, read_size)))
-			return (free_cache(&cache, -1));
-		free_cache(&cache, 0);
-		cache = tmp;
-		if (pos_nextline(cache) != -1)
+		buff[r_size] = '\0';
+		cur->content = ft_strjoin(cur->content, buff);
+		if (pos_nextline(cur->content) != -1)
 			break ;
 	}
-	if (read_size < 0)
-		return (free_cache(&cache, -1));
-	if (read_size == 0 && (!cache || *cache == '\0')
-		&& (*line = ft_strnew()))
-		return (free_cache(&cache, 0));
-	return (extract(line, &cache, pos_nextline(cache)));
+	if (r_size < 0 && !(*line = 0))
+		return (-1);
+	if (r_size == 0 && (!(cur->content) || *(cur->content) == '\0')
+		&& (*line = ft_strnew()) && del_cache(&begin, fd))
+		return (0);
+	return (extract(line, &begin, pos_nextline(cur->content), fd));
 }
